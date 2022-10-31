@@ -25,12 +25,19 @@ describe('[Challenge] Naive receiver', function () {
 
         this.receiver = await FlashLoanReceiverFactory.deploy(this.pool.address);
         await deployer.sendTransaction({ to: this.receiver.address, value: ETHER_IN_RECEIVER });
+
+        // my code: 
+        const AttackerFactory = await ethers.getContractFactory('AttackerNaive', attacker);
+        this.attack = await AttackerFactory.deploy(this.pool.address);
+        // ends
         
         expect(await ethers.provider.getBalance(this.receiver.address)).to.be.equal(ETHER_IN_RECEIVER);
     });
 
     it('Exploit', async function () {
-        /** CODE YOUR EXPLOIT HERE */   
+        /** CODE YOUR EXPLOIT HERE */
+
+        await this.attack.attack(this.receiver.address);
     });
 
     after(async function () {

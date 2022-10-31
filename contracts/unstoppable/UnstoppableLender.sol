@@ -37,7 +37,9 @@ contract UnstoppableLender is ReentrancyGuard {
         require(balanceBefore >= borrowAmount, "Not enough tokens in pool");
 
         // Ensured by the protocol via the `depositTokens` function
-        assert(poolBalance == balanceBefore);
+        assert(poolBalance == balanceBefore); 
+        // This above would become problematic when a person transfers DVT's to this lender pool through ERC20 native functions
+        // since they wouldn't update the 'poolBalance' variable
         
         damnValuableToken.transfer(msg.sender, borrowAmount);
         

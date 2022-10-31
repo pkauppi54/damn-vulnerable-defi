@@ -18,6 +18,11 @@ describe('[Challenge] Truster', function () {
 
         await this.token.transfer(this.pool.address, TOKENS_IN_POOL);
 
+        // my code: 
+        const Borrower = await ethers.getContractFactory('Borrower', attacker);
+        this.borrower = await Borrower.deploy(this.pool.address, this.token.address);
+        // ends
+
         expect(
             await this.token.balanceOf(this.pool.address)
         ).to.equal(TOKENS_IN_POOL);
@@ -29,6 +34,7 @@ describe('[Challenge] Truster', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE  */
+        await this.borrower.borrow(attacker.address);
     });
 
     after(async function () {

@@ -18,6 +18,11 @@ describe('[Challenge] Side entrance', function () {
 
         this.attackerInitialEthBalance = await ethers.provider.getBalance(attacker.address);
 
+        // my code:
+        const SideEntranceBorrower = await ethers.getContractFactory('SideEntranceBorrower', attacker);
+        this.borrower = await SideEntranceBorrower.deploy(this.pool.address);
+        // ends
+
         expect(
             await ethers.provider.getBalance(this.pool.address)
         ).to.equal(ETHER_IN_POOL);
@@ -25,6 +30,7 @@ describe('[Challenge] Side entrance', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        this.borrower.attack(attacker.address);
     });
 
     after(async function () {
