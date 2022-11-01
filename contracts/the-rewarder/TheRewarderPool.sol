@@ -68,9 +68,11 @@ contract TheRewarderPool {
         if(isNewRewardsRound()) {
             _recordSnapshot();
         }        
+
+        // We need to have a isNewRewardsRound() new round before calling
         
-        uint256 totalDeposits = accToken.totalSupplyAt(lastSnapshotIdForRewards);
-        uint256 amountDeposited = accToken.balanceOfAt(msg.sender, lastSnapshotIdForRewards);
+        uint256 totalDeposits = accToken.totalSupplyAt(lastSnapshotIdForRewards); 
+        uint256 amountDeposited = accToken.balanceOfAt(msg.sender, lastSnapshotIdForRewards); 
 
         if (amountDeposited > 0 && totalDeposits > 0) {
             rewards = (amountDeposited * 100 * 10 ** 18) / totalDeposits;
@@ -86,7 +88,7 @@ contract TheRewarderPool {
 
     function _recordSnapshot() private {
         lastSnapshotIdForRewards = accToken.snapshot();
-        lastRecordedSnapshotTimestamp = block.timestamp;
+        lastRecordedSnapshotTimestamp = block.timestamp; 
         roundNumber++;
     }
 
