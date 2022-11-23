@@ -1,12 +1,10 @@
-![](cover.png)
 
-**A set of challenges to learn offensive security of smart contracts in Ethereum.**
 
-Featuring flash loans, price oracles, governance, NFTs, lending pools, smart contract wallets, timelocks, and more!
+## My solutions to the challenges from Damn Vulnerable Defi
 
-## Play
+Find the solutions from `/test` directory.
 
-Visit [damnvulnerabledefi.xyz](https://damnvulnerabledefi.xyz)
+Some solutions require a smart contract and they are located in the `/contracts` directory along with the target contract.
 
 ## Disclaimer
 
