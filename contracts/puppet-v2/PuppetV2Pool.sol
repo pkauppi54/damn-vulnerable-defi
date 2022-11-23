@@ -50,7 +50,7 @@ contract PuppetV2Pool {
         uint256 depositOfWETHRequired = calculateDepositOfWETHRequired(borrowAmount);
         
         // Take the WETH
-        _weth.transferFrom(msg.sender, address(this), depositOfWETHRequired);
+        _weth.transferFrom(msg.sender, address(this), depositOfWETHRequired); /// will this revert?
 
         // internal accounting
         deposits[msg.sender] += depositOfWETHRequired;
@@ -61,7 +61,9 @@ contract PuppetV2Pool {
     }
 
     function calculateDepositOfWETHRequired(uint256 tokenAmount) public view returns (uint256) {
-        return _getOracleQuote(tokenAmount).mul(3) / (10 ** 18);
+        return _getOracleQuote(tokenAmount).mul(3) / (10 ** 18); 
+
+        /// this is multiplying the quote and not the borrowAmount -> up to the quote to determine the final price
     }
 
     // Fetch the price from Uniswap v2 using the official libraries

