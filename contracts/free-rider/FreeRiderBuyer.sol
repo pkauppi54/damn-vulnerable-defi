@@ -25,7 +25,7 @@ contract FreeRiderBuyer is ReentrancyGuard, IERC721Receiver {
         IERC721(_nft).setApprovalForAll(msg.sender, true);
     }
 
-    // Read https://eips.ethereum.org/EIPS/eip-721 for more info on this function
+    // Read https://eips.ethereum.org/EIP   S/eip-721 for more info on this function
     function onERC721Received(
         address,
         address,
@@ -49,4 +49,15 @@ contract FreeRiderBuyer is ReentrancyGuard, IERC721Receiver {
 
         return IERC721Receiver.onERC721Received.selector;
     }
+
+    function attack(Market  _market, uint256[] memory _tokenIds) external payable {
+        Market(_market).buyMany{value: 15 ether}(_tokenIds);
+    
+    }
+
+    receive() external payable {}
+}
+
+interface Market {
+    function buyMany(uint256[] calldata tokenIds) external payable;
 }

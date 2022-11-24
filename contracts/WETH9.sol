@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
 // Taken from address 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 at mainnet
 
 /**
@@ -19,7 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-pragma solidity ^0.7.0;
 
 contract WETH9 {
     string public name     = "Wrapped Ether";
@@ -46,7 +48,7 @@ contract WETH9 {
     function withdraw(uint wad) public {
         require(balanceOf[msg.sender] >= wad);
         balanceOf[msg.sender] -= wad;
-        msg.sender.transfer(wad);
+        payable(msg.sender).transfer(wad);
         emit Withdrawal(msg.sender, wad);
     }
 
@@ -70,7 +72,7 @@ contract WETH9 {
     {
         require(balanceOf[src] >= wad);
 
-        if (src != msg.sender && allowance[src][msg.sender] != uint(-1)) {
+        if (src != msg.sender && allowance[src][msg.sender] != type(uint256).max) {
             require(allowance[src][msg.sender] >= wad);
             allowance[src][msg.sender] -= wad;
         }

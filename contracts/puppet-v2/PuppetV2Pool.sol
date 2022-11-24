@@ -50,12 +50,12 @@ contract PuppetV2Pool {
         uint256 depositOfWETHRequired = calculateDepositOfWETHRequired(borrowAmount);
         
         // Take the WETH
-        _weth.transferFrom(msg.sender, address(this), depositOfWETHRequired); /// will this revert?
+        _weth.transferFrom(msg.sender, address(this), depositOfWETHRequired); /// returns true if success, reverts when fails
 
         // internal accounting
         deposits[msg.sender] += depositOfWETHRequired;
 
-        require(_token.transfer(msg.sender, borrowAmount));
+        require(_token.transfer(msg.sender, borrowAmount)); 
 
         emit Borrowed(msg.sender, depositOfWETHRequired, borrowAmount, block.timestamp);
     }
@@ -63,7 +63,7 @@ contract PuppetV2Pool {
     function calculateDepositOfWETHRequired(uint256 tokenAmount) public view returns (uint256) {
         return _getOracleQuote(tokenAmount).mul(3) / (10 ** 18); 
 
-        /// this is multiplying the quote and not the borrowAmount -> up to the quote to determine the final price
+        /// this is multiplying the quote and not the initial borrowAmount -> up to the quote to determine the final price
     }
 
     // Fetch the price from Uniswap v2 using the official libraries

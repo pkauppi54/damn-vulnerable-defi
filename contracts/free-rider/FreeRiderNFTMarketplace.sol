@@ -59,17 +59,22 @@ contract FreeRiderNFTMarketplace is ReentrancyGuard {
         emit NFTOffered(msg.sender, tokenId, price);
     }
 
+    // @note tokenId arrays are not validated here but instead they are validated in the ERC721 safeTransferFrom() function
+
     function buyMany(uint256[] calldata tokenIds) external payable nonReentrant {
         for (uint256 i = 0; i < tokenIds.length; i++) {
             _buyOne(tokenIds[i]);
         }
     }
 
+    // @note The vulnerability is in this function at line 83 -> payable(token.ownerOf...
+    //       contract sends the value paid by the buyer AFTER the owner has changed and not BEFORE.
+    //       Because of this the buyer first gets the NFT and then gets the money back and keeps the NFT... 
     function _buyOne(uint256 tokenId) private {       
         uint256 priceToPay = offers[tokenId];
         require(priceToPay > 0, "Token is not being offered");
 
-        require(msg.value >= priceToPay, "Amount paid is not enough");
+        require(msg.value >= priceToPay, "Amount paid is not enough");  
 
         amountOfOffers--;
 
