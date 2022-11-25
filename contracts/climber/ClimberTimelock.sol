@@ -104,7 +104,12 @@ contract ClimberTimelock is AccessControl {
         for (uint8 i = 0; i < targets.length; i++) {
             targets[i].functionCallWithValue(dataElements[i], values[i]);
         }
-        
+        // @note Vulnerability: This require statement should have been before the execution loop
+        //       Now weare able to 
+        //       1. grant ourself the proposer role
+        //       2. change the time delay to 0
+        //       3. Execute all calls as the owner of ClimberVault aka this contract
+        //       4. Match our calls and schedule an operation with the matching id
         require(getOperationState(id) == OperationState.ReadyForExecution);
         operations[id].executed = true;
     }

@@ -59,7 +59,7 @@ contract WalletRegistry is IProxyCreationCallback, Ownable {
              setting the registry's address as the callback.
      */
     function proxyCreated(
-        GnosisSafeProxy proxy,
+        GnosisSafeProxy proxy, // created proxy
         address singleton,
         bytes calldata initializer,
         uint256
@@ -80,8 +80,12 @@ contract WalletRegistry is IProxyCreationCallback, Ownable {
         require(GnosisSafe(walletAddress).getThreshold() == MAX_THRESHOLD, "Invalid threshold");
         require(GnosisSafe(walletAddress).getOwners().length == MAX_OWNERS, "Invalid number of owners");       
 
+        // @note Vulnerability is in this next line of code: 
+        //       Checking the array of owners from the gnosis safe isn't enough to 
+        //       validate that the creator was a beneficiary since the owners are passed in by creator
+
         // Ensure the owner is a registered beneficiary
-        address walletOwner = GnosisSafe(walletAddress).getOwners()[0];
+        address walletOwner = GnosisSafe(walletAddress).getOwners()[0]; // BAD!!
 
         require(beneficiaries[walletOwner], "Owner is not registered as beneficiary");
 

