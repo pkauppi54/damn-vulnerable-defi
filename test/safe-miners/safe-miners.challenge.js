@@ -24,6 +24,7 @@ describe('[Challenge] Safe Miners', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        console.log(await (await this.token.balanceOf(DEPOSIT_ADDRESS)).toString())
     });
 
     after(async function () {

